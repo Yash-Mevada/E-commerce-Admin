@@ -1,4 +1,10 @@
-export const sidebarItems = [
+export interface SidebarItem {
+  title: string
+  url: string
+  icon: string
+}
+
+export const sidebarItems: SidebarItem[] = [
   {
     title: "Dashboard",
     url: "/dashboard",
@@ -20,8 +26,13 @@ export const sidebarItems = [
     icon: "Users",
   },
   {
+    title: "Users",
+    url: "/users",
+    icon: "User",
+  },
+  {
     title: "Settings",
     url: "/settings",
     icon: "Settings",
   },
-];
+]
