@@ -15,7 +15,7 @@ import { Home, Package, ShoppingCart, Users, Settings, Gem, LogOut, User, Sun, M
 import { NavLink } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { useAppDispatch } from '../../store'
-import { logout } from '../../store/authSlice'
+import { logout } from '@/store/auth/authSlice'
 import LogoImg from '@/assets/logo.png'
 
 // Icon mapping type-safe definition

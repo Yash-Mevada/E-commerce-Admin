@@ -1,25 +1,25 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useAppSelector, useAppDispatch } from '@/store'
-import { UserRecord } from '@/types/user'
-import { useUsersQuery } from '@/hooks/useUsersQuery'
+import { ProductRecord } from '@/types/product'
+import { useProductsQuery } from '@/hooks/useProductsQuery'
+import { useCategorysQuery } from '@/hooks/useCategorysQuery'
 import {
   setKeyword,
   setPage,
   setLimit,
   setSort,
-} from '@/store/user/userSlice'
+} from '@/store/product/productSlice'
 import { Icons } from '@/components/Icons'
-import { Button } from '@/components/ui/button'
 import { CustomInput } from '@/components/CustomInput'
 import { CustomTable } from '@/components/CustomTable'
-import { AddUserModal } from './components/AddUserModal'
-import { EditUserModal } from './components/EditUserModal'
+import { AddProductModal } from './components/AddProductModal'
+import { EditProductModal } from './components/EditProductModal'
 import { CustomDeleteModal } from '@/components/CustomDeleteModal'
-import { getColumns } from './UserTableConfig'
-import { deleteUser } from '@/store/user/userCrud'
+import { getColumns } from './ProductTableConfig'
+import { deleteProduct } from '@/store/product/productCrud'
 import CustomHeader from '@/components/CustomHeader'
 
-const Users: React.FC = () => {
+const Products: React.FC = () => {
   const dispatch = useAppDispatch()
   const token = useAppSelector((state) => state.auth.token)
 
@@ -29,30 +29,39 @@ const Users: React.FC = () => {
     pagination,
     filter,
     sort
-  } = useAppSelector((state) => state.user)
+  } = useAppSelector((state) => state.product)
 
   // Local state for search & modal visibility
   const [searchVal, setSearchVal] = useState(filter.keyword)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [editingUser, setEditingUser] = useState<UserRecord | null>(null)
+  const [editingProduct, setEditingProduct] = useState<ProductRecord | null>(null)
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
   const columns = useMemo(
     () =>
       getColumns({
-        onEdit: setEditingUser,
+        onEdit: setEditingProduct,
         onDelete: setDeleteConfirmId,
       }),
-    [setEditingUser, setDeleteConfirmId]
+    [setEditingProduct, setDeleteConfirmId]
   )
 
-  // React Query Fetch hook
-  const { data, isLoading, isError, error: queryError, refetch } = useUsersQuery({
+  // React Query Fetch hooks
+  const { data, isLoading, isError, error: queryError, refetch } = useProductsQuery({
     token,
     pagination,
     filter,
     sort,
   })
+
+  // Fetch categories for Select inputs
+  const { data: categoriesData } = useCategorysQuery({
+    token,
+    pagination: { page: 1, limit: 100 },
+    filter: { keyword: '', search: ['name'] },
+    sort: { name: 'ASC' }
+  })
+  const categoriesList = categoriesData?.rows || []
 
   // Debounce/handle search input
   useEffect(() => {
@@ -78,38 +87,34 @@ const Users: React.FC = () => {
   }
 
   // Handle Delete Confirmation
-  const handleDeleteUser = async (id: string) => {
+  const handleDeleteProduct = async (id: string) => {
     if (!token) return
     try {
-      const success = await deleteUser(dispatch, token, id)
+      const success = await deleteProduct(dispatch, token, id)
       if (success) {
         setDeleteConfirmId(null)
         refetch() // Sync state with backend using React Query refetch
       }
     } catch (err: any) {
-      // Error is handled inside userCrud.deleteUser
+      // Error is handled inside productCrud.deleteProduct
     }
   }
 
-  const users = data?.rows || []
+  const products = data?.rows || []
   const totalCount = data?.count || 0
-  const totalPages = Math.ceil(totalCount / pagination.limit)
-  const displayError = deleteError || (isError ? (queryError as Error).message || 'Failed to load users.' : null)
-
-
+  const displayError = deleteError || (isError ? (queryError as Error).message || 'Failed to load products.' : null)
 
   return (
     <div className="space-y-6">
       {/* Header section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-
         <CustomHeader
-          title="User Management"
-          subtitle="View, search, and manage registered admin and customer users."
+          title="Products"
+          subtitle="View, search, and manage your product catalog."
           handleOpen={() => setIsAddModalOpen(true)}
           refetch={refetch}
           isLoading={isLoading}
-          buttonName="Add User"
+          buttonName="Add Product"
         />
       </div>
 
@@ -119,7 +124,7 @@ const Users: React.FC = () => {
           <Icons.Search className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400" />
           <CustomInput
             type="text"
-            placeholder="Search by name, email..."
+            placeholder="Search products by name or description..."
             value={searchVal}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchVal(e.target.value)}
             className="pl-12 pr-10 h-12 w-full text-sm"
@@ -135,7 +140,7 @@ const Users: React.FC = () => {
         </div>
       </div>
 
-      {/* Main card panel */}
+      {/* Main card panel - Flat Aesthetic (No shadow-sm) */}
       <div className="bg-white dark:bg-slate-950 rounded-2xl border border-slate-150 dark:border-slate-800 overflow-hidden flex flex-col">
 
         {/* Error notification */}
@@ -146,13 +151,10 @@ const Users: React.FC = () => {
           </div>
         )}
 
-        {/* Custom Table Component */}
         <CustomTable
           columns={columns}
-          data={users}
+          data={products}
           isLoading={isLoading}
-          loadingRowsCount={pagination.limit}
-          keyExtractor={(user) => user.id}
           sort={sort}
           onSort={handleSortClick}
           pagination={{
@@ -166,32 +168,34 @@ const Users: React.FC = () => {
       </div>
 
       {/* Modals */}
-      <AddUserModal
+      <AddProductModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSuccess={refetch}
         token={token}
+        categories={categoriesList}
       />
 
-      <EditUserModal
-        isOpen={!!editingUser}
-        onClose={() => setEditingUser(null)}
+      <EditProductModal
+        isOpen={!!editingProduct}
+        onClose={() => setEditingProduct(null)}
         onSuccess={refetch}
         token={token}
-        user={editingUser}
+        product={editingProduct}
+        categories={categoriesList}
       />
 
       <CustomDeleteModal
         isOpen={!!deleteConfirmId}
         onClose={() => setDeleteConfirmId(null)}
-        onConfirm={() => deleteConfirmId && handleDeleteUser(deleteConfirmId)}
-        title="Delete User Account"
-        description="Are you sure you want to permanently delete this user account? This action is irreversible and will revoke all access privileges."
-        confirmText="Delete Account"
+        onConfirm={() => deleteConfirmId && handleDeleteProduct(deleteConfirmId)}
+        title="Delete Product"
+        description="Are you sure you want to permanently delete this product? This action is irreversible."
+        confirmText="Delete Product"
         isLoading={isDeleting}
       />
     </div>
   )
 }
 
-export default Users
+export default Products

@@ -11,6 +11,11 @@ export const sidebarItems: SidebarItem[] = [
     icon: "Home",
   },
   {
+    title: "Categories",
+    url: "/categories",
+    icon: "Package",
+  },
+  {
     title: "Products",
     url: "/products",
     icon: "Package",
@@ -20,11 +25,11 @@ export const sidebarItems: SidebarItem[] = [
     url: "/orders",
     icon: "ShoppingCart",
   },
-  {
-    title: "Customers",
-    url: "/customers",
-    icon: "Users",
-  },
+  // {
+  //   title: "Customers",
+  //   url: "/customers",
+  //   icon: "Users",
+  // },
   {
     title: "Users",
     url: "/users",

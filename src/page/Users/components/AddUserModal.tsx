@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react'
 import { useFormik } from 'formik'
-import * as Yup from 'yup'
 import { CustomModal } from '@/components/CustomModal'
 import { CustomInput } from '@/components/CustomInput'
 import { CustomSelect } from '@/components/CustomSelect'
 import { CustomLabel } from '@/components/CustomLabel'
+import { CustomPhoneInput } from '@/components/CustomPhoneInput'
 import { Button } from '@/components/ui/button'
-import { userService } from '@/services/api'
+import { createUser } from '@/store/user/userCrud'
+import { CustomError } from '@/components/CustomError'
+import { addUserValidationSchema } from '../utils/validation'
 
 interface AddUserModalProps {
   isOpen: boolean
@@ -14,31 +16,6 @@ interface AddUserModalProps {
   onSuccess: () => void
   token: string | null
 }
-
-const addUserValidationSchema = Yup.object({
-  first_name: Yup.string()
-    .trim()
-    .required('First Name is required'),
-  last_name: Yup.string()
-    .trim()
-    .required('Last Name is required'),
-  email: Yup.string()
-    .trim()
-    .email('Invalid email address')
-    .required('Email address is required'),
-  password: Yup.string()
-    .min(8, 'Password must be at least 8 characters')
-    .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .matches(/[0-9]/, 'Password must contain at least one number')
-    .matches(/[^a-zA-Z0-9]/, 'Password must contain at least one special character')
-    .required('Password is required'),
-  phone_number: Yup.string()
-    .trim(),
-  role: Yup.string()
-    .oneOf(['user', 'admin'], 'Invalid role')
-    .required('System role is required'),
-})
 
 export const AddUserModal: React.FC<AddUserModalProps> = ({
   isOpen,
@@ -56,11 +33,12 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
       password: '',
     },
     validationSchema: addUserValidationSchema,
+    validateOnBlur: false,
     onSubmit: async (values, { setSubmitting, setStatus }) => {
       if (!token) return
       try {
         setStatus(null)
-        await userService.createUser(token, values)
+        await createUser(token, values)
         formik.resetForm()
         onClose()
         onSuccess()
@@ -107,9 +85,7 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
               onBlur={formik.handleBlur}
               placeholder="John"
             />
-            {formik.touched.first_name && formik.errors.first_name && (
-              <span className="text-[10px] text-red-500 font-medium">{formik.errors.first_name}</span>
-            )}
+             <CustomError error={formik.errors.first_name} touched={formik.touched.first_name} />
           </div>
           <div className="flex flex-col gap-2">
             <CustomLabel required>Last Name</CustomLabel>
@@ -120,9 +96,7 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
               onBlur={formik.handleBlur}
               placeholder="Doe"
             />
-            {formik.touched.last_name && formik.errors.last_name && (
-              <span className="text-[10px] text-red-500 font-medium">{formik.errors.last_name}</span>
-            )}
+             <CustomError error={formik.errors.last_name} touched={formik.touched.last_name} />
           </div>
         </div>
 
@@ -136,9 +110,7 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
             onBlur={formik.handleBlur}
             placeholder="john.doe@example.com"
           />
-          {formik.touched.email && formik.errors.email && (
-            <span className="text-[10px] text-red-500 font-medium">{formik.errors.email}</span>
-          )}
+           <CustomError error={formik.errors.email} touched={formik.touched.email} />
         </div>
 
         <div className="flex flex-col gap-2">
@@ -170,19 +142,17 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
             onBlur={formik.handleBlur}
             placeholder="••••••••"
           />
-          {formik.touched.password && formik.errors.password && (
-            <span className="text-[10px] text-red-500 font-medium">{formik.errors.password}</span>
-          )}
+           <CustomError error={formik.errors.password} touched={formik.touched.password} />
         </div>
 
         <div className="flex flex-col gap-2">
-          <CustomLabel>Phone Number</CustomLabel>
-          <CustomInput
+          <CustomLabel required>Phone Number</CustomLabel>
+          <CustomPhoneInput
             name="phone_number"
             value={formik.values.phone_number}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            placeholder="555-0100"
+            onChange={(val) => formik.setFieldValue('phone_number', val)}
+            onBlur={() => formik.setFieldTouched('phone_number', true)}
+            error={formik.touched.phone_number ? formik.errors.phone_number as string : undefined}
           />
         </div>
 

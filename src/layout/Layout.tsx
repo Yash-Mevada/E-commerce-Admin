@@ -4,7 +4,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import AppSidebar from '@/page/AppSidebar/AppSidebar'
 import { useAppSelector, useAppDispatch } from '@/store'
-import { logout } from '@/store/authSlice'
+import { logout } from '@/store/auth/authSlice'
 import { User, LogOut, ChevronDown, Sun, Moon } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { Icons } from '@/components/Icons'
@@ -200,7 +200,7 @@ const Layout: React.FC = () => {
           </div>
 
           {/* Main Page Content */}
-          <div className="flex-1 p-6">
+          <div className="flex-1 p-6 text-left">
             <Outlet />
           </div>
         </main>

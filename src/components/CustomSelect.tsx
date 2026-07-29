@@ -20,7 +20,7 @@ const customStyles: StylesConfig<Option, false> = {
   control: (provided, state) => ({
     ...provided,
     height: '40px',
-    borderRadius: '12px',
+    borderRadius: '11px',
     borderColor: state.isFocused ? '#3b82f6' : 'var(--border)',
     boxShadow: 'none',
     '&:hover': {
@@ -41,11 +41,12 @@ const customStyles: StylesConfig<Option, false> = {
   }),
   menu: (provided) => ({
     ...provided,
-    borderRadius: '12px',
+    borderRadius: '11px',
     boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
     border: '1px solid var(--border)',
     backgroundColor: 'var(--popover)',
     overflow: 'hidden',
+    zIndex: 50,
   }),
   option: (provided, state) => ({
     ...provided,

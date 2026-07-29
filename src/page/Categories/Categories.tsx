@@ -1,25 +1,25 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useAppSelector, useAppDispatch } from '@/store'
-import { UserRecord } from '@/types/user'
-import { useUsersQuery } from '@/hooks/useUsersQuery'
+import { CategoryRecord } from '@/types/category'
+import { useCategorysQuery } from '@/hooks/useCategorysQuery'
 import {
   setKeyword,
   setPage,
   setLimit,
   setSort,
-} from '@/store/user/userSlice'
+} from '@/store/category/categorySlice'
 import { Icons } from '@/components/Icons'
 import { Button } from '@/components/ui/button'
 import { CustomInput } from '@/components/CustomInput'
 import { CustomTable } from '@/components/CustomTable'
-import { AddUserModal } from './components/AddUserModal'
-import { EditUserModal } from './components/EditUserModal'
+import { AddCategoryModal } from './components/AddCategoryModal'
+import { EditCategoryModal } from './components/EditCategoryModal'
 import { CustomDeleteModal } from '@/components/CustomDeleteModal'
-import { getColumns } from './UserTableConfig'
-import { deleteUser } from '@/store/user/userCrud'
+import { getColumns } from './CategoryTableConfig'
+import { deleteCategory } from '@/store/category/categoryCrud'
 import CustomHeader from '@/components/CustomHeader'
 
-const Users: React.FC = () => {
+const Categories: React.FC = () => {
   const dispatch = useAppDispatch()
   const token = useAppSelector((state) => state.auth.token)
 
@@ -29,25 +29,25 @@ const Users: React.FC = () => {
     pagination,
     filter,
     sort
-  } = useAppSelector((state) => state.user)
+  } = useAppSelector((state) => state.category)
 
   // Local state for search & modal visibility
   const [searchVal, setSearchVal] = useState(filter.keyword)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [editingUser, setEditingUser] = useState<UserRecord | null>(null)
+  const [editingCategory, setEditingCategory] = useState<CategoryRecord | null>(null)
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
   const columns = useMemo(
     () =>
       getColumns({
-        onEdit: setEditingUser,
+        onEdit: setEditingCategory,
         onDelete: setDeleteConfirmId,
       }),
-    [setEditingUser, setDeleteConfirmId]
+    [setEditingCategory, setDeleteConfirmId]
   )
 
   // React Query Fetch hook
-  const { data, isLoading, isError, error: queryError, refetch } = useUsersQuery({
+  const { data, isLoading, isError, error: queryError, refetch } = useCategorysQuery({
     token,
     pagination,
     filter,
@@ -78,38 +78,35 @@ const Users: React.FC = () => {
   }
 
   // Handle Delete Confirmation
-  const handleDeleteUser = async (id: string) => {
+  const handleDeleteCategory = async (id: string) => {
     if (!token) return
     try {
-      const success = await deleteUser(dispatch, token, id)
+      const success = await deleteCategory(dispatch, token, id)
       if (success) {
         setDeleteConfirmId(null)
         refetch() // Sync state with backend using React Query refetch
       }
     } catch (err: any) {
-      // Error is handled inside userCrud.deleteUser
+      // Error is handled inside categoryCrud.deleteCategory
     }
   }
 
-  const users = data?.rows || []
+  const categories = data?.rows || []
   const totalCount = data?.count || 0
   const totalPages = Math.ceil(totalCount / pagination.limit)
-  const displayError = deleteError || (isError ? (queryError as Error).message || 'Failed to load users.' : null)
-
-
+  const displayError = deleteError || (isError ? (queryError as Error).message || 'Failed to load categories.' : null)
 
   return (
     <div className="space-y-6">
       {/* Header section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-
         <CustomHeader
-          title="User Management"
-          subtitle="View, search, and manage registered admin and customer users."
+          title="Categories"
+          subtitle="View, search, and manage product categories."
           handleOpen={() => setIsAddModalOpen(true)}
           refetch={refetch}
           isLoading={isLoading}
-          buttonName="Add User"
+          buttonName="Add Category"
         />
       </div>
 
@@ -119,7 +116,7 @@ const Users: React.FC = () => {
           <Icons.Search className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400" />
           <CustomInput
             type="text"
-            placeholder="Search by name, email..."
+            placeholder="Search categories by name..."
             value={searchVal}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchVal(e.target.value)}
             className="pl-12 pr-10 h-12 w-full text-sm"
@@ -149,10 +146,10 @@ const Users: React.FC = () => {
         {/* Custom Table Component */}
         <CustomTable
           columns={columns}
-          data={users}
+          data={categories}
           isLoading={isLoading}
           loadingRowsCount={pagination.limit}
-          keyExtractor={(user) => user.id}
+          keyExtractor={(category) => category.id}
           sort={sort}
           onSort={handleSortClick}
           pagination={{
@@ -166,32 +163,32 @@ const Users: React.FC = () => {
       </div>
 
       {/* Modals */}
-      <AddUserModal
+      <AddCategoryModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSuccess={refetch}
         token={token}
       />
 
-      <EditUserModal
-        isOpen={!!editingUser}
-        onClose={() => setEditingUser(null)}
+      <EditCategoryModal
+        isOpen={!!editingCategory}
+        onClose={() => setEditingCategory(null)}
         onSuccess={refetch}
         token={token}
-        user={editingUser}
+        category={editingCategory}
       />
 
       <CustomDeleteModal
         isOpen={!!deleteConfirmId}
         onClose={() => setDeleteConfirmId(null)}
-        onConfirm={() => deleteConfirmId && handleDeleteUser(deleteConfirmId)}
-        title="Delete User Account"
-        description="Are you sure you want to permanently delete this user account? This action is irreversible and will revoke all access privileges."
-        confirmText="Delete Account"
+        onConfirm={() => deleteConfirmId && handleDeleteCategory(deleteConfirmId)}
+        title="Delete Category"
+        description="Are you sure you want to permanently delete this category? All associated product relations might be affected. This action is irreversible."
+        confirmText="Delete Category"
         isLoading={isDeleting}
       />
     </div>
   )
 }
 
-export default Users
+export default Categories

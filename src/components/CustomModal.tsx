@@ -7,12 +7,15 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 
+import { cn } from '@/lib/utils'
+
 interface CustomModalProps {
   isOpen: boolean
   onClose: () => void
   title: string
   description?: string
   children: React.ReactNode
+  className?: string
 }
 
 export const CustomModal: React.FC<CustomModalProps> = ({
@@ -21,10 +24,11 @@ export const CustomModal: React.FC<CustomModalProps> = ({
   title,
   description,
   children,
+  className,
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={(open: boolean) => { if (!open) onClose() }}>
-      <DialogContent className="sm:max-w-[500px] rounded-2xl bg-white border border-slate-150 p-6 shadow-xl gap-4 dark:bg-slate-950 dark:border-slate-800">
+      <DialogContent className={cn("sm:max-w-[500px] rounded-2xl bg-white border border-slate-150 p-6 shadow-xl gap-4 dark:bg-slate-950 dark:border-slate-800", className)}>
         <DialogHeader className="space-y-1.5 text-left">
           <DialogTitle className="text-lg font-bold text-slate-900 tracking-tight dark:text-slate-100">
             {title}

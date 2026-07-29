@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAppSelector, useAppDispatch } from '@/store'
-import { authService } from '@/services/api'
-import { updateProfile } from '@/store/authSlice'
+import { getProfile } from '@/store/auth/authCrud'
+import { updateProfile } from '@/store/auth/authSlice'
 import { User, Mail, Shield, Award, Clock, Phone } from 'lucide-react'
 
 const Profile: React.FC = () => {
@@ -17,7 +17,7 @@ const Profile: React.FC = () => {
       try {
         setLoading(true)
         setError(null)
-        const profileData = await authService.getProfile(token)
+        const profileData = await getProfile(token)
 
         // Update user state in Redux store
         dispatch(

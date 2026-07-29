@@ -1,10 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { UserRecord } from '@/services/api'
 
-interface UserState {
-  users: UserRecord[]
-  totalCount: number
-  isLoading: boolean
+interface ProductState {
   isDeleting: boolean
   error: string | null
   pagination: {
@@ -18,10 +14,7 @@ interface UserState {
   sort: Record<string, 'ASC' | 'DESC'>
 }
 
-const initialState: UserState = {
-  users: [],
-  totalCount: 0,
-  isLoading: false,
+const initialState: ProductState = {
   isDeleting: false,
   error: null,
   pagination: {
@@ -30,42 +23,26 @@ const initialState: UserState = {
   },
   filter: {
     keyword: '',
-    search: ['first_name', 'last_name', 'email'],
+    search: ['name', 'description'],
   },
   sort: {
     created_at: 'DESC',
   },
 }
 
-const userSlice = createSlice({
-  name: 'user',
+const productSlice = createSlice({
+  name: 'product',
   initialState,
   reducers: {
-    fetchUsersStart(state) {
-      state.isLoading = true
-      state.error = null
-    },
-    fetchUsersSuccess(state, action: PayloadAction<{ rows: UserRecord[]; count: number }>) {
-      state.isLoading = false
-      state.users = action.payload.rows
-      state.totalCount = action.payload.count
-      state.error = null
-    },
-    fetchUsersFailure(state, action: PayloadAction<string>) {
-      state.isLoading = false
-      state.error = action.payload
-    },
-    deleteUserStart(state) {
+    deleteProductStart(state) {
       state.isDeleting = true
       state.error = null
     },
-    deleteUserSuccess(state, action: PayloadAction<string>) {
+    deleteProductSuccess(state) {
       state.isDeleting = false
-      state.users = state.users.filter((user) => user.id !== action.payload)
-      state.totalCount = Math.max(0, state.totalCount - 1)
       state.error = null
     },
-    deleteUserFailure(state, action: PayloadAction<string>) {
+    deleteProductFailure(state, action: PayloadAction<string>) {
       state.isDeleting = false
       state.error = action.payload
     },
@@ -92,17 +69,14 @@ const userSlice = createSlice({
 })
 
 export const {
-  fetchUsersStart,
-  fetchUsersSuccess,
-  fetchUsersFailure,
-  deleteUserStart,
-  deleteUserSuccess,
-  deleteUserFailure,
+  deleteProductStart,
+  deleteProductSuccess,
+  deleteProductFailure,
   setKeyword,
   setPage,
   setLimit,
   setSort,
   resetFilters,
-} = userSlice.actions
+} = productSlice.actions
 
-export default userSlice.reducer
+export default productSlice.reducer

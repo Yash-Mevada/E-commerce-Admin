@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../store'
-import { authService } from '../../services/api'
-import { clearError } from '../../store/authSlice'
+import { login } from '@/store/auth/authCrud'
+import { clearError } from '@/store/auth/authSlice'
 import { Gem, Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react'
 import LogoImg from '@/assets/logo.png'
 
@@ -50,7 +50,7 @@ const Login: React.FC = () => {
     }
 
     try {
-      await authService.login(email, password, dispatch)
+      await login(email, password, dispatch)
     } catch (err) {
       // Errors handled by slice + service
     }

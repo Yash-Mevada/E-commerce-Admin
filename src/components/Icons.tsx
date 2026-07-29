@@ -13,8 +13,10 @@ import {
   ChevronRight,
   AlertCircle,
   Edit,
+  Pencil,
   Moon,
-  Sun
+  Sun,
+  Upload
 } from 'lucide-react'
 
 export const Icons = {
@@ -32,8 +34,10 @@ export const Icons = {
   ChevronRight,
   Alert: AlertCircle,
   Edit,
+  Pen: Pencil,
   Moon,
-  Sun
+  Sun,
+  Upload
 } as const
 
 export type IconType = keyof typeof Icons

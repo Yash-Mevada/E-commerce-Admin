@@ -1,12 +1,15 @@
 import React, { useEffect } from 'react'
 import { useFormik } from 'formik'
-import * as Yup from 'yup'
 import { CustomModal } from '@/components/CustomModal'
 import { CustomInput } from '@/components/CustomInput'
 import { CustomSelect } from '@/components/CustomSelect'
 import { CustomLabel } from '@/components/CustomLabel'
+import { CustomPhoneInput } from '@/components/CustomPhoneInput'
 import { Button } from '@/components/ui/button'
-import { userService, UserRecord } from '@/services/api'
+import { UserRecord } from '@/types/user'
+import { updateUser } from '@/store/user/userCrud'
+import { CustomError } from '@/components/CustomError'
+import { editUserValidationSchema } from '../utils/validation'
 
 interface EditUserModalProps {
   isOpen: boolean
@@ -15,24 +18,6 @@ interface EditUserModalProps {
   token: string | null
   user: UserRecord | null
 }
-
-const editUserValidationSchema = Yup.object({
-  first_name: Yup.string()
-    .trim()
-    .required('First Name is required'),
-  last_name: Yup.string()
-    .trim()
-    .required('Last Name is required'),
-  email: Yup.string()
-    .trim()
-    .email('Invalid email address')
-    .required('Email address is required'),
-  phone_number: Yup.string()
-    .trim(),
-  role: Yup.string()
-    .oneOf(['user', 'admin'], 'Invalid role')
-    .required('System role is required'),
-})
 
 export const EditUserModal: React.FC<EditUserModalProps> = ({
   isOpen,
@@ -50,11 +35,12 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
       role: 'user',
     },
     validationSchema: editUserValidationSchema,
+    validateOnBlur: false,
     onSubmit: async (values, { setSubmitting, setStatus }) => {
       if (!token || !user) return
       try {
         setStatus(null)
-        await userService.updateUser(token, user.id, values)
+        await updateUser(token, user.id, values)
         onClose()
         onSuccess()
       } catch (err: any) {
@@ -102,9 +88,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
               onBlur={formik.handleBlur}
               placeholder="John"
             />
-            {formik.touched.first_name && formik.errors.first_name && (
-              <span className="text-[10px] text-red-500 font-medium">{formik.errors.first_name}</span>
-            )}
+             <CustomError error={formik.errors.first_name} touched={formik.touched.first_name} />
           </div>
           <div className="flex flex-col gap-2">
             <CustomLabel required>Last Name</CustomLabel>
@@ -115,9 +99,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
               onBlur={formik.handleBlur}
               placeholder="Doe"
             />
-            {formik.touched.last_name && formik.errors.last_name && (
-              <span className="text-[10px] text-red-500 font-medium">{formik.errors.last_name}</span>
-            )}
+             <CustomError error={formik.errors.last_name} touched={formik.touched.last_name} />
           </div>
         </div>
 
@@ -131,19 +113,17 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
             onBlur={formik.handleBlur}
             placeholder="john.doe@example.com"
           />
-          {formik.touched.email && formik.errors.email && (
-            <span className="text-[10px] text-red-500 font-medium">{formik.errors.email}</span>
-          )}
+           <CustomError error={formik.errors.email} touched={formik.touched.email} />
         </div>
 
         <div className="flex flex-col gap-2">
-          <CustomLabel>Phone Number</CustomLabel>
-          <CustomInput
+          <CustomLabel required>Phone Number</CustomLabel>
+          <CustomPhoneInput
             name="phone_number"
             value={formik.values.phone_number}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            placeholder="555-0100"
+            onChange={(val) => formik.setFieldValue('phone_number', val)}
+            onBlur={() => formik.setFieldTouched('phone_number', true)}
+            error={formik.touched.phone_number ? formik.errors.phone_number as string : undefined}
           />
         </div>
 

@@ -24,14 +24,14 @@ export const CustomDeleteModal: React.FC<CustomDeleteModalProps> = ({
   isLoading = false,
 }) => {
   return (
-    <CustomModal isOpen={isOpen} onClose={onClose} title={title}>
+    <CustomModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={title}
+      className="shadow-none border-none ring-0 outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none focus:outline-none [&>button]:focus:ring-0 [&>button]:focus-visible:ring-0 [&>button]:focus-visible:outline-none [&>button]:focus:outline-none [&>button]:outline-none"
+    >
       <div className="space-y-4">
-        <div className="flex items-center gap-3 text-red-600">
-          <div className="size-10 rounded-xl bg-red-50 dark:bg-red-950/30 flex items-center justify-center shrink-0">
-            <Icons.Trash className="size-5" />
-          </div>
-          <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">{title}</h3>
-        </div>
+
 
         <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
           {description}
@@ -40,14 +40,14 @@ export const CustomDeleteModal: React.FC<CustomDeleteModalProps> = ({
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
           <button
             onClick={onClose}
-            className="px-4 py-2 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-600 dark:text-slate-400 rounded-xl text-xs font-semibold cursor-pointer transition-colors bg-white dark:bg-slate-950"
+            className="px-4 py-2 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-600 dark:text-slate-400 rounded-xl text-xs font-semibold cursor-pointer transition-colors bg-white dark:bg-slate-950 focus:ring-0 focus-visible:ring-0 focus:outline-none focus-visible:outline-none"
             disabled={isLoading}
           >
             {cancelText}
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-semibold cursor-pointer border-none shadow-md shadow-red-500/10 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-semibold cursor-pointer border-none shadow-none transition-colors flex items-center gap-2 focus:ring-0 focus-visible:ring-0 focus:outline-none focus-visible:outline-none"
             disabled={isLoading}
           >
             {isLoading ? (
