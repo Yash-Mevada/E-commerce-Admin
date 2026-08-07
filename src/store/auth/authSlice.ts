@@ -40,7 +40,7 @@ const authSlice = createSlice({
       state.isLoading = true
       state.error = null
     },
-    loginSuccess(state, action: PayloadAction<{ user: User; token: string }>) {
+    loginSuccess(state, action: PayloadAction<{ user: User | null; token: string | null }>) {
       state.isLoading = false
       state.isAuthenticated = true
       state.user = action.payload.user
@@ -48,7 +48,7 @@ const authSlice = createSlice({
       state.error = null
 
       // Save to localStorage for persistence
-      localStorage.setItem(tokenKey, action.payload.token)
+      localStorage.setItem(tokenKey, action.payload.token as string)
       localStorage.setItem(userKey, JSON.stringify(action.payload.user))
     },
     loginFailure(state, action: PayloadAction<string>) {

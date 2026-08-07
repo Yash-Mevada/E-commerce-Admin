@@ -12,6 +12,11 @@ interface ProductState {
     search: string[]
   }
   sort: Record<string, 'ASC' | 'DESC'>
+  filterByCategory: string
+  filterByDate: {
+    startDate: string
+    endDate: string
+  }
 }
 
 const initialState: ProductState = {
@@ -27,6 +32,11 @@ const initialState: ProductState = {
   },
   sort: {
     created_at: 'DESC',
+  },
+  filterByCategory: '',
+  filterByDate: {
+    startDate: '',
+    endDate: '',
   },
 }
 
@@ -60,10 +70,27 @@ const productSlice = createSlice({
     setSort(state, action: PayloadAction<Record<string, 'ASC' | 'DESC'>>) {
       state.sort = action.payload
     },
+    setFilterByCategory(state, action: PayloadAction<string>) {
+      state.filterByCategory = action.payload
+      state.pagination.page = 1 // Reset to first page on filter change
+    },
+    setStartDate(state, action: PayloadAction<string>) {
+      state.filterByDate.startDate = action.payload
+      state.pagination.page = 1
+    },
+    setEndDate(state, action: PayloadAction<string>) {
+      state.filterByDate.endDate = action.payload
+      state.pagination.page = 1
+    },
     resetFilters(state) {
       state.filter.keyword = ''
       state.pagination.page = 1
       state.sort = { created_at: 'DESC' }
+      state.filterByCategory = ''
+      state.filterByDate = {
+        startDate: '',
+        endDate: '',
+      }
     },
   },
 })
@@ -76,6 +103,9 @@ export const {
   setPage,
   setLimit,
   setSort,
+  setFilterByCategory,
+  setStartDate,
+  setEndDate,
   resetFilters,
 } = productSlice.actions
 

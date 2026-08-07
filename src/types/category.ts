@@ -4,5 +4,5 @@ export interface CategoryRecord {
   description: string
   created_at: string
   updated_at: string
-  Products?: any[]
+  products?: any[]
 }

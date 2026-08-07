@@ -16,7 +16,12 @@ import {
   Pencil,
   Moon,
   Sun,
-  Upload
+  Upload,
+  Calendar,
+  ChevronDown,
+  Package,
+  Layers,
+  Users
 } from 'lucide-react'
 
 export const Icons = {
@@ -37,7 +42,12 @@ export const Icons = {
   Pen: Pencil,
   Moon,
   Sun,
-  Upload
+  Upload,
+  Calendar,
+  ChevronDown,
+  Package,
+  Layers,
+  Users
 } as const
 
 export type IconType = keyof typeof Icons

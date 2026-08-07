@@ -7,7 +7,7 @@ import { useAppSelector } from '@/store'
 import Dashboard from '@/page/Dashboard/Dashboard'
 import Products from '@/page/Products/Products'
 import Orders from '@/page/Orders/Orders'
-// import Customers from '@/page/Customers/Customers'
+import Customers from '@/page/Customers/Customers'
 import Users from '@/page/Users/Users'
 import Settings from '@/page/Settings/Settings'
 import Login from '@/page/Login/Login'
@@ -27,6 +27,7 @@ const ProtectedRoute: React.FC<RouteProps> = ({ children }) => {
 // Public Route wrapper (prevent authenticated users from reaching login page)
 const PublicRoute: React.FC<RouteProps> = ({ children }) => {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
+  debugger
   return isAuthenticated ? <Navigate to="/dashboard" replace /> : <>{children}</>
 }
 
@@ -54,7 +55,7 @@ const router = createBrowserRouter([
       { path: '/products', element: <Products /> },
       { path: '/categories', element: <Categories /> },
       { path: '/orders', element: <Orders /> },
-      // { path: '/customers', element: <Customers /> },
+      { path: '/customers', element: <Customers /> },
       { path: '/users', element: <Users /> },
       { path: '/settings', element: <Settings /> },
       { path: '/profile', element: <Profile /> },

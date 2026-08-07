@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { useFormik } from 'formik'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CustomModal } from '@/components/CustomModal'
 import { CustomInput } from '@/components/CustomInput'
 import { CustomLabel } from '@/components/CustomLabel'
@@ -28,6 +29,33 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
   categories,
 }) => {
 
+  const queryClient = useQueryClient()
+
+  const createProductMutation = useMutation({
+    mutationFn: async (payload: {
+      name: string
+      description: string
+      price: number
+      stock: number
+      category_id: string
+      image: string
+    }) => {
+      if (!token) throw new Error('No authentication token found')
+      return createProduct(token, payload)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] })
+      onSuccess()
+      onClose()
+    },
+    onError: (err: any) => {
+      formik.setStatus(err?.message || 'Something went wrong. Please try again.')
+    },
+    onSettled: () => {
+      formik.setSubmitting(false)
+    }
+  })
+
   const formik = useFormik({
     initialValues: {
       name: '',
@@ -39,24 +67,15 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
     },
     validationSchema: productValidationSchema,
     validateOnBlur: false,
-    onSubmit: async (values, { setSubmitting, setStatus }) => {
-      if (!token) return
-      try {
-        await createProduct(token, {
-          name: values.name,
-          description: values.description,
-          price: Number(values.price),
-          stock: Number(values.stock),
-          category_id: values.category_id,
-          image: values.image,
-        })
-        onSuccess()
-        onClose()
-      } catch (err: any) {
-        setStatus(err?.message || 'Something went wrong. Please try again.')
-      } finally {
-        setSubmitting(false)
-      }
+    onSubmit: (values) => {
+      createProductMutation.mutate({
+        name: values.name,
+        description: values.description,
+        price: Number(values.price),
+        stock: Number(values.stock),
+        category_id: values.category_id,
+        image: values.image,
+      })
     },
   })
 
@@ -176,10 +195,10 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
           </Button>
           <Button
             type="submit"
-            disabled={formik.isSubmitting}
+            disabled={formik.isSubmitting || createProductMutation.isPending}
             className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-4 transition-colors"
           >
-            {formik.isSubmitting ? 'Creating...' : 'Create Product'}
+            {formik.isSubmitting || createProductMutation.isPending ? 'Creating...' : 'Create Product'}
           </Button>
         </div>
       </form>

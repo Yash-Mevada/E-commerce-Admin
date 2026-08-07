@@ -25,11 +25,11 @@ export const sidebarItems: SidebarItem[] = [
     url: "/orders",
     icon: "ShoppingCart",
   },
-  // {
-  //   title: "Customers",
-  //   url: "/customers",
-  //   icon: "Users",
-  // },
+  {
+    title: "Customers",
+    url: "/customers",
+    icon: "Users",
+  },
   {
     title: "Users",
     url: "/users",

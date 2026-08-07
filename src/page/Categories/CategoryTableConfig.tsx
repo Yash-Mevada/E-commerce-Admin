@@ -46,7 +46,7 @@ export const getColumns = ({ onEdit, onDelete }: CategoryColumnsProps): Column<C
     key: 'products_count',
     header: 'Products Count',
     render: (category) => {
-      const count = category.Products?.length || 0
+      const count = category.products?.length || 0
       return (
         <span className="text-slate-500 dark:text-slate-400">
           {count} {count === 1 ? 'product' : 'products'}

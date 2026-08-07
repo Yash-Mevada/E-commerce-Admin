@@ -79,9 +79,9 @@ const Layout: React.FC = () => {
     <TooltipProvider>
       <SidebarProvider>
         <AppSidebar />
-        <main className="flex-1 min-h-screen bg-slate-50/30 dark:bg-slate-900 flex flex-col transition-colors duration-200">
+        <main className="flex-1 min-h-screen bg-slate-50/30 dark:bg-slate-900 flex flex-col transition-colors duration-200 overflow-hidden">
           {/* Header Bar */}
-          <div className="flex items-center justify-between p-4 border-b bg-white dark:bg-slate-950 dark:border-slate-800 w-full shadow-sm">
+          <div className="flex items-center justify-between p-4 border-b bg-white dark:bg-slate-950 dark:border-slate-800 w-full shadow-sm ">
             <div className="flex items-center gap-4">
               <SidebarTrigger className="dark:text-slate-200" />
             </div>

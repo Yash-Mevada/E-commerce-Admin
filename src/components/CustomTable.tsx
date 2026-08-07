@@ -1,5 +1,5 @@
 import React from 'react'
-import { ArrowUp, ArrowDown, ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowUp, ArrowDown, ArrowUpDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -125,8 +125,9 @@ export function CustomTable<T>({
           {/* Showing range & Limit selector */}
           <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 font-medium">
             <span>
-              Showing {data.length > 0 ? (pagination.page - 1) * pagination.limit + 1 : 0} to{' '}
-              {Math.min(pagination.page * pagination.limit, pagination.totalCount)} of {pagination.totalCount} items
+              Showing <span className="font-semibold text-slate-900 dark:text-slate-100">{data.length > 0 ? (pagination.page - 1) * pagination.limit + 1 : 0}</span> to{' '}
+              <span className="font-semibold text-slate-900 dark:text-slate-100">{Math.min(pagination.page * pagination.limit, pagination.totalCount)}</span> of{' '}
+              <span className="font-semibold text-slate-900 dark:text-slate-100">{pagination.totalCount}</span>
             </span>
             <div className="flex items-center gap-2">
               <span>Rows per page</span>
@@ -146,46 +147,109 @@ export function CustomTable<T>({
 
           {/* Nav controls */}
           <div className="flex items-center gap-1 sm:ml-auto">
+            {/* First Page */}
+            <Button
+              onClick={() => pagination.onPageChange(1)}
+              disabled={pagination.page === 1 || isLoading}
+              variant="ghost"
+              size="icon"
+              className="size-8 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 disabled:opacity-50 cursor-pointer"
+            >
+              <ChevronsLeft className="size-4" />
+            </Button>
+
+            {/* Previous Page */}
             <Button
               onClick={() => pagination.onPageChange(pagination.page - 1)}
               disabled={pagination.page === 1 || isLoading}
-              variant="outline"
+              variant="ghost"
               size="icon"
-              className="size-8 rounded-lg bg-white border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="size-8 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 disabled:opacity-50 cursor-pointer"
             >
               <ChevronLeft className="size-4" />
             </Button>
 
+            {/* Page numbers with ellipsis */}
             <div className="flex items-center gap-1 px-1">
-              {Array.from({ length: totalPages }).map((_, index) => {
-                const pageNum = index + 1
-                const isCurrent = pageNum === pagination.page
+              {(() => {
+                const pages: (number | string)[] = []
+                const maxVisible = 5
 
-                return (
-                  <Button
-                    key={pageNum}
-                    onClick={() => pagination.onPageChange(pageNum)}
-                    disabled={isLoading}
-                    variant={isCurrent ? 'default' : 'outline'}
-                    className={`size-8 p-0 text-xs rounded-lg transition-colors font-semibold ${isCurrent
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                      : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-600 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800'
+                if (totalPages <= maxVisible) {
+                  for (let i = 1; i <= totalPages; i++) {
+                    pages.push(i)
+                  }
+                } else {
+                  pages.push(1)
+
+                  const start = Math.max(2, pagination.page - 1)
+                  const end = Math.min(totalPages - 1, pagination.page + 1)
+
+                  if (start > 2) {
+                    pages.push('...')
+                  }
+
+                  for (let i = start; i <= end; i++) {
+                    pages.push(i)
+                  }
+
+                  if (end < totalPages - 1) {
+                    pages.push('...')
+                  }
+
+                  pages.push(totalPages)
+                }
+
+                return pages.map((pageNum, idx) => {
+                  if (pageNum === '...') {
+                    return (
+                      <span key={`ellipsis-${idx}`} className="px-1 text-xs text-slate-400 font-medium select-none">
+                        ...
+                      </span>
+                    )
+                  }
+
+                  const isCurrent = pageNum === pagination.page
+
+                  return (
+                    <Button
+                      key={pageNum}
+                      onClick={() => pagination.onPageChange(pageNum as number)}
+                      disabled={isLoading}
+                      variant={isCurrent ? 'outline' : 'ghost'}
+                      className={`size-8 p-0 text-xs rounded-lg transition-colors font-semibold cursor-pointer ${
+                        isCurrent
+                          ? 'border border-slate-200 bg-white text-slate-900 font-bold dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50'
+                          : 'text-slate-500 hover:text-slate-850 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900'
                       }`}
-                  >
-                    {pageNum}
-                  </Button>
-                )
-              })}
+                    >
+                      {pageNum}
+                    </Button>
+                  )
+                })
+              })()}
             </div>
 
+            {/* Next Page */}
             <Button
               onClick={() => pagination.onPageChange(pagination.page + 1)}
               disabled={pagination.page === totalPages || isLoading}
-              variant="outline"
+              variant="ghost"
               size="icon"
-              className="size-8 rounded-lg bg-white border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="size-8 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 disabled:opacity-50 cursor-pointer"
             >
               <ChevronRight className="size-4" />
+            </Button>
+
+            {/* Last Page */}
+            <Button
+              onClick={() => pagination.onPageChange(totalPages)}
+              disabled={pagination.page === totalPages || isLoading}
+              variant="ghost"
+              size="icon"
+              className="size-8 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 disabled:opacity-50 cursor-pointer"
+            >
+              <ChevronsRight className="size-4" />
             </Button>
           </div>
         </div>
